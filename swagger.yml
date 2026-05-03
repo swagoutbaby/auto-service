@@ -1,0 +1,466 @@
+openapi: 3.0.0
+info:
+  title: "Auto Service API"
+  description: "REST API for auto service management"
+  version: "1.0.0"
+
+servers:
+  - url: "/api"
+
+components:
+  schemas:
+    Client:
+      type: object
+      properties:
+        id:
+          type: integer
+        surname:
+          type: string
+        first_name:
+          type: string
+        father_name:
+          type: string
+        phone:
+          type: string
+        visits:
+          type: integer
+    Master:
+      type: object
+      properties:
+        id:
+          type: integer
+        surname:
+          type: string
+        first_name:
+          type: string
+        father_name:
+          type: string
+        specialty:
+          type: string
+    Order:
+      type: object
+      properties:
+        id:
+          type: integer
+        client_id:
+          type: integer
+        master_id:
+          type: integer
+        box_num:
+          type: integer
+        car:
+          type: string
+        service_type:
+          type: string
+        status:
+          type: string
+        booking_type:
+          type: string
+        created_at:
+          type: string
+        completed_at:
+          type: string
+    Discount:
+      type: object
+      properties:
+        id:
+          type: integer
+        client_id:
+          type: integer
+        percent:
+          type: integer
+    BoxSchedule:
+      type: object
+      properties:
+        id:
+          type: integer
+        box_num:
+          type: integer
+        date:
+          type: string
+        hour:
+          type: integer
+        order_id:
+          type: integer
+
+  parameters:
+    client_id:
+      name: client_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    master_id:
+      name: master_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    order_id:
+      name: order_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    discount_id:
+      name: discount_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    schedule_id:
+      name: schedule_id
+      in: path
+      required: true
+      schema:
+        type: integer
+
+paths:
+  # ==================== CLIENTS ====================
+  /clients:
+    get:
+      operationId: "clients.read_all"
+      summary: "Get all clients"
+      tags: ["Clients"]
+      responses:
+        "200":
+          description: "Success"
+    post:
+      operationId: "clients.create"
+      summary: "Create a new client"
+      tags: ["Clients"]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [surname, first_name]
+              properties:
+                surname: {type: string}
+                first_name: {type: string}
+                father_name: {type: string}
+                phone: {type: string}
+                visits: {type: integer}
+      responses:
+        "201":
+          description: "Created"
+
+  /clients/{client_id}:
+    get:
+      operationId: "clients.read_one"
+      summary: "Get client by ID"
+      tags: ["Clients"]
+      parameters:
+        - $ref: "#/components/parameters/client_id"
+      responses:
+        "200":
+          description: "Success"
+    put:
+      operationId: "clients.update"
+      summary: "Update client"
+      tags: ["Clients"]
+      parameters:
+        - $ref: "#/components/parameters/client_id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                surname: {type: string}
+                first_name: {type: string}
+                father_name: {type: string}
+                phone: {type: string}
+                visits: {type: integer}
+      responses:
+        "200":
+          description: "Success"
+    delete:
+      operationId: "clients.delete"
+      summary: "Delete client"
+      tags: ["Clients"]
+      parameters:
+        - $ref: "#/components/parameters/client_id"
+      responses:
+        "204":
+          description: "Deleted"
+
+  # ==================== MASTERS ====================
+  /masters:
+    get:
+      operationId: "masters.read_all"
+      summary: "Get all masters"
+      tags: ["Masters"]
+      responses:
+        "200":
+          description: "Success"
+    post:
+      operationId: "masters.create"
+      summary: "Create a new master"
+      tags: ["Masters"]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [surname, first_name, specialty]
+              properties:
+                surname: {type: string}
+                first_name: {type: string}
+                father_name: {type: string}
+                specialty: {type: string}
+      responses:
+        "201":
+          description: "Created"
+
+  /masters/{master_id}:
+    get:
+      operationId: "masters.read_one"
+      summary: "Get master by ID"
+      tags: ["Masters"]
+      parameters:
+        - $ref: "#/components/parameters/master_id"
+      responses:
+        "200":
+          description: "Success"
+    put:
+      operationId: "masters.update"
+      summary: "Update master"
+      tags: ["Masters"]
+      parameters:
+        - $ref: "#/components/parameters/master_id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                surname: {type: string}
+                first_name: {type: string}
+                father_name: {type: string}
+                specialty: {type: string}
+      responses:
+        "200":
+          description: "Success"
+    delete:
+      operationId: "masters.delete"
+      summary: "Delete master"
+      tags: ["Masters"]
+      parameters:
+        - $ref: "#/components/parameters/master_id"
+      responses:
+        "204":
+          description: "Deleted"
+
+  # ==================== ORDERS ====================
+  /orders:
+    get:
+      operationId: "orders.read_all"
+      summary: "Get all orders"
+      tags: ["Orders"]
+      responses:
+        "200":
+          description: "Success"
+    post:
+      operationId: "orders.create"
+      summary: "Create a new order"
+      tags: ["Orders"]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [client_id, master_id, box_num, service_type, booking_type]
+              properties:
+                client_id: {type: integer}
+                master_id: {type: integer}
+                box_num: {type: integer}
+                car: {type: string}
+                service_type: {type: string}
+                status: {type: string}
+                booking_type: {type: string}
+      responses:
+        "201":
+          description: "Created"
+
+  /orders/{order_id}:
+    get:
+      operationId: "orders.read_one"
+      summary: "Get order by ID"
+      tags: ["Orders"]
+      parameters:
+        - $ref: "#/components/parameters/order_id"
+      responses:
+        "200":
+          description: "Success"
+    put:
+      operationId: "orders.update"
+      summary: "Update order"
+      tags: ["Orders"]
+      parameters:
+        - $ref: "#/components/parameters/order_id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                client_id: {type: integer}
+                master_id: {type: integer}
+                box_num: {type: integer}
+                car: {type: string}
+                service_type: {type: string}
+                status: {type: string}
+                booking_type: {type: string}
+                completed_at: {type: string}
+      responses:
+        "200":
+          description: "Success"
+    delete:
+      operationId: "orders.delete"
+      summary: "Delete order"
+      tags: ["Orders"]
+      parameters:
+        - $ref: "#/components/parameters/order_id"
+      responses:
+        "204":
+          description: "Deleted"
+
+  # ==================== DISCOUNTS ====================
+  /discounts:
+    get:
+      operationId: "discounts.read_all"
+      summary: "Get all discounts"
+      tags: ["Discounts"]
+      responses:
+        "200":
+          description: "Success"
+    post:
+      operationId: "discounts.create"
+      summary: "Create a new discount"
+      tags: ["Discounts"]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [client_id, percent]
+              properties:
+                client_id: {type: integer}
+                percent: {type: integer}
+      responses:
+        "201":
+          description: "Created"
+
+  /discounts/{discount_id}:
+    get:
+      operationId: "discounts.read_one"
+      summary: "Get discount by ID"
+      tags: ["Discounts"]
+      parameters:
+        - $ref: "#/components/parameters/discount_id"
+      responses:
+        "200":
+          description: "Success"
+    put:
+      operationId: "discounts.update"
+      summary: "Update discount"
+      tags: ["Discounts"]
+      parameters:
+        - $ref: "#/components/parameters/discount_id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                percent: {type: integer}
+      responses:
+        "200":
+          description: "Success"
+    delete:
+      operationId: "discounts.delete"
+      summary: "Delete discount"
+      tags: ["Discounts"]
+      parameters:
+        - $ref: "#/components/parameters/discount_id"
+      responses:
+        "204":
+          description: "Deleted"
+
+  # ==================== BOX SCHEDULE ====================
+  /box_schedule:
+    get:
+      operationId: "box_schedule.read_all"
+      summary: "Get all box schedule records"
+      tags: ["Box Schedule"]
+      responses:
+        "200":
+          description: "Success"
+    post:
+      operationId: "box_schedule.create"
+      summary: "Create a new box schedule record"
+      tags: ["Box Schedule"]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [box_num, date, hour, order_id]
+              properties:
+                box_num: {type: integer}
+                date: {type: string}
+                hour: {type: integer}
+                order_id: {type: integer}
+      responses:
+        "201":
+          description: "Created"
+
+  /box_schedule/{schedule_id}:
+    get:
+      operationId: "box_schedule.read_one"
+      summary: "Get box schedule record by ID"
+      tags: ["Box Schedule"]
+      parameters:
+        - $ref: "#/components/parameters/schedule_id"
+      responses:
+        "200":
+          description: "Success"
+    put:
+      operationId: "box_schedule.update"
+      summary: "Update box schedule record"
+      tags: ["Box Schedule"]
+      parameters:
+        - $ref: "#/components/parameters/schedule_id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                box_num: {type: integer}
+                date: {type: string}
+                hour: {type: integer}
+                order_id: {type: integer}
+      responses:
+        "200":
+          description: "Success"
+    delete:
+      operationId: "box_schedule.delete"
+      summary: "Delete box schedule record"
+      tags: ["Box Schedule"]
+      parameters:
+        - $ref: "#/components/parameters/schedule_id"
+      responses:
+        "204":
+          description: "Deleted"
