@@ -473,13 +473,8 @@ async function loadSchedule() {
       <span class="card__id">#${s.id}</span>
       <div class="card__title" style="display:flex;align-items:center;gap:10px">
         <span style="background:var(--accent);color:#fff;font-family:var(--mono);
-          font-size:11px;padding:3px 8px;border-radius:3px;flex-shrink:0">БОК ${s.box_num}</span>
+          font-size:11px;padding:3px 8px;border-radius:3px;flex-shrink:0">БОКС ${s.box_num}</span>
         <span style="font-family:var(--mono);color:var(--accent2)">${s.date}</span>
-      </div>
-      <div class="card__row">
-        <span class="card__label">Час</span>
-        <span class="card__value" style="font-family:var(--mono);font-size:20px;
-          font-weight:600;color:var(--text)">${String(s.hour).padStart(2,'0')}:00</span>
       </div>
       <div class="card__row">
         <span class="card__label">Заказ</span>
@@ -495,7 +490,7 @@ async function loadSchedule() {
 document.getElementById('btn-add-schedule').addEventListener('click', () => {
   document.getElementById('schedule-edit-id').value = '';
   document.getElementById('schedule-modal-title').textContent = 'ДОБАВИТЬ ЗАПИСЬ В БОКС';
-  ['schedule-box-num','schedule-date','schedule-hour','schedule-order-id'].forEach(id =>
+  ['schedule-box-num','schedule-date','schedule-order-id'].forEach(id =>
     document.getElementById(id).value = '');
   openModal('schedule-modal');
 });
@@ -506,15 +501,13 @@ document.getElementById('schedule-save').addEventListener('click', async () => {
   const id       = document.getElementById('schedule-edit-id').value;
   const box_num  = parseInt(document.getElementById('schedule-box-num').value);
   const date     = document.getElementById('schedule-date').value;
-  const hour     = parseInt(document.getElementById('schedule-hour').value);
   const order_id = parseInt(document.getElementById('schedule-order-id').value);
 
-  if (!box_num || !date || isNaN(hour) || !order_id) {
+  if (!box_num || !date || !order_id) {
     toast('Заполните все поля', 'error'); return;
   }
-  if (hour < 0 || hour > 23) { toast('Час должен быть от 0 до 23', 'error'); return; }
 
-  const body = { box_num, date, hour, order_id };
+  const body = { box_num, date, order_id };
   try {
     if (id) {
       await apiFetch(`/box_schedule/${id}`, { method: 'PUT', body: JSON.stringify(body) });
@@ -534,7 +527,6 @@ async function editSchedule(id) {
     document.getElementById('schedule-edit-id').value   = s.id;
     document.getElementById('schedule-box-num').value   = s.box_num;
     document.getElementById('schedule-date').value      = s.date;
-    document.getElementById('schedule-hour').value      = s.hour;
     document.getElementById('schedule-order-id').value  = s.order_id;
     document.getElementById('schedule-modal-title').textContent = 'РЕДАКТИРОВАТЬ ЗАПИСЬ';
     openModal('schedule-modal');
