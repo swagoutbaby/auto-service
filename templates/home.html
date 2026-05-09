@@ -1,12 +1,261 @@
-<!-- templates/home.html -->
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <title>RP Flask REST API</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>АвтоСервис — Панель управления</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
 </head>
 <body>
-    <h1>Hello, World!</h1>
+
+<header class="header">
+  <div class="header__logo">АВТОСЕРВИС <span>// ADMIN v1</span></div>
+  <nav class="nav">
+    <button class="nav__btn active" data-section="clients">Клиенты</button>
+    <button class="nav__btn" data-section="masters">Мастера</button>
+    <button class="nav__btn" data-section="orders">Заказы</button>
+    <button class="nav__btn" data-section="discounts">Скидки</button>
+    <button class="nav__btn" data-section="schedule">Расписание</button>
+  </nav>
+  <div class="header__stats">
+    <div><strong id="stat-clients">—</strong>клиентов</div>
+    <div><strong id="stat-masters">—</strong>мастеров</div>
+    <div><strong id="stat-orders">—</strong>заказов</div>
+  </div>
+</header>
+
+<main class="main">
+
+  <!-- ═══ CLIENTS ═══ -->
+  <section class="section active" id="section-clients">
+    <div class="section__header">
+      <h2 class="section__title">КЛИЕНТЫ</h2>
+      <span class="section__count" id="clients-count">0 записей</span>
+    </div>
+    <div class="toolbar">
+      <button class="btn btn-primary" id="btn-add-client">+ Добавить клиента</button>
+    </div>
+    <div class="cards" id="clients-list"></div>
+  </section>
+
+  <!-- ═══ MASTERS ═══ -->
+  <section class="section" id="section-masters">
+    <div class="section__header">
+      <h2 class="section__title">МАСТЕРА</h2>
+      <span class="section__count" id="masters-count">0 записей</span>
+    </div>
+    <div class="toolbar">
+      <button class="btn btn-primary" id="btn-add-master">+ Добавить мастера</button>
+    </div>
+    <div class="cards" id="masters-list"></div>
+  </section>
+
+  <!-- ═══ ORDERS ═══ -->
+  <section class="section" id="section-orders">
+    <div class="section__header">
+      <h2 class="section__title">ЗАКАЗЫ</h2>
+      <span class="section__count" id="orders-count">0 записей</span>
+    </div>
+    <div class="toolbar">
+      <button class="btn btn-primary" id="btn-add-order">+ Новый заказ</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Клиент ID</th><th>Мастер ID</th><th>Бокс</th>
+            <th>Автомобиль</th><th>Услуга</th><th>Тип записи</th>
+            <th>Статус</th><th>Создан</th><th>Действия</th>
+          </tr>
+        </thead>
+        <tbody id="orders-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ═══ DISCOUNTS ═══ -->
+  <section class="section" id="section-discounts">
+    <div class="section__header">
+      <h2 class="section__title">СКИДКИ</h2>
+      <span class="section__count" id="discounts-count">0 записей</span>
+    </div>
+    <div class="toolbar">
+      <button class="btn btn-primary" id="btn-add-discount">+ Добавить скидку</button>
+    </div>
+    <div class="cards" id="discounts-list"></div>
+  </section>
+
+  <!-- ═══ BOX SCHEDULE ═══ -->
+  <section class="section" id="section-schedule">
+    <div class="section__header">
+      <h2 class="section__title">РАСПИСАНИЕ БОКСОВ</h2>
+      <span class="section__count" id="schedule-count">0 записей</span>
+    </div>
+    <div class="toolbar">
+      <button class="btn btn-primary" id="btn-add-schedule">+ Добавить запись</button>
+    </div>
+    <div class="schedule-grid" id="schedule-list"></div>
+  </section>
+
+</main>
+
+<!-- ═══ MODAL: CLIENT ═══ -->
+<div class="modal-overlay" id="client-modal">
+  <div class="modal">
+    <h3 class="modal__title" id="client-modal-title">ДОБАВИТЬ КЛИЕНТА</h3>
+    <input type="hidden" id="client-edit-id" />
+    <div class="form-group">
+      <label>Фамилия *</label>
+      <input type="text" id="client-surname" placeholder="Петров" />
+    </div>
+    <div class="form-group">
+      <label>Имя *</label>
+      <input type="text" id="client-first-name" placeholder="Иван" />
+    </div>
+    <div class="form-group">
+      <label>Отчество</label>
+      <input type="text" id="client-father-name" placeholder="Сергеевич" />
+    </div>
+    <div class="form-group">
+      <label>Телефон</label>
+      <input type="text" id="client-phone" placeholder="+7 900 000-00-00" />
+    </div>
+    <div class="form-group">
+      <label>Количество визитов</label>
+      <input type="number" id="client-visits" min="0" placeholder="0" />
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn-secondary" id="client-cancel">Отмена</button>
+      <button class="btn btn-primary" id="client-save">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: MASTER ═══ -->
+<div class="modal-overlay" id="master-modal">
+  <div class="modal">
+    <h3 class="modal__title" id="master-modal-title">ДОБАВИТЬ МАСТЕРА</h3>
+    <input type="hidden" id="master-edit-id" />
+    <div class="form-group">
+      <label>Фамилия *</label>
+      <input type="text" id="master-surname" placeholder="Волков" />
+    </div>
+    <div class="form-group">
+      <label>Имя *</label>
+      <input type="text" id="master-first-name" placeholder="Дмитрий" />
+    </div>
+    <div class="form-group">
+      <label>Отчество</label>
+      <input type="text" id="master-father-name" placeholder="Андреевич" />
+    </div>
+    <div class="form-group">
+      <label>Специализация *</label>
+      <input type="text" id="master-specialty" placeholder="Двигатель и ходовая" />
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn-secondary" id="master-cancel">Отмена</button>
+      <button class="btn btn-primary" id="master-save">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: ORDER ═══ -->
+<div class="modal-overlay" id="order-modal">
+  <div class="modal">
+    <h3 class="modal__title" id="order-modal-title">НОВЫЙ ЗАКАЗ</h3>
+    <input type="hidden" id="order-edit-id" />
+    <div class="form-group">
+      <label>ID Клиента *</label>
+      <input type="number" id="order-client-id" min="1" placeholder="1" />
+    </div>
+    <div class="form-group">
+      <label>ID Мастера *</label>
+      <input type="number" id="order-master-id" min="1" placeholder="1" />
+    </div>
+    <div class="form-group">
+      <label>Номер бокса *</label>
+      <input type="number" id="order-box-num" min="1" placeholder="1" />
+    </div>
+    <div class="form-group">
+      <label>Автомобиль</label>
+      <input type="text" id="order-car" placeholder="Toyota Camry 2020" />
+    </div>
+    <div class="form-group">
+      <label>Тип услуги *</label>
+      <input type="text" id="order-service-type" placeholder="Замена масла" />
+    </div>
+    <div class="form-group">
+      <label>Тип записи *</label>
+      <select id="order-booking-type">
+        <option value="Онлайн">Онлайн</option>
+        <option value="Телефон">Телефон</option>
+        <option value="Лично">Лично</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Статус</label>
+      <select id="order-status">
+        <option value="В работе">В работе</option>
+        <option value="Завершён">Завершён</option>
+        <option value="Отменён">Отменён</option>
+      </select>
+    </div>
+    <div class="form-group" id="order-completed-wrap" style="display:none">
+      <label>Дата завершения</label>
+      <input type="datetime-local" id="order-completed-at" />
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn-secondary" id="order-cancel">Отмена</button>
+      <button class="btn btn-primary" id="order-save">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: DISCOUNT ═══ -->
+<div class="modal-overlay" id="discount-modal">
+  <div class="modal">
+    <h3 class="modal__title" id="discount-modal-title">ДОБАВИТЬ СКИДКУ</h3>
+    <input type="hidden" id="discount-edit-id" />
+    <div class="form-group">
+      <label>ID Клиента *</label>
+      <input type="number" id="discount-client-id" min="1" placeholder="1" />
+    </div>
+    <div class="form-group">
+      <label>Процент скидки (0–30) *</label>
+      <input type="number" id="discount-percent" min="0" max="30" placeholder="10" />
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn-secondary" id="discount-cancel">Отмена</button>
+      <button class="btn btn-primary" id="discount-save">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: SCHEDULE ═══ -->
+<div class="modal-overlay" id="schedule-modal">
+  <div class="modal">
+    <h3 class="modal__title" id="schedule-modal-title">ДОБАВИТЬ ЗАПИСЬ В БОКС</h3>
+    <input type="hidden" id="schedule-edit-id" />
+    <div class="form-group">
+      <label>Номер бокса *</label>
+      <input type="number" id="schedule-box-num" min="1" placeholder="1" />
+    </div>
+    <div class="form-group">
+      <label>Дата *</label>
+      <input type="date" id="schedule-date" />
+    </div>
+    <div class="form-group">
+      <label>ID Заказа *</label>
+      <input type="number" id="schedule-order-id" min="1" placeholder="1" />
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn-secondary" id="schedule-cancel">Отмена</button>
+      <button class="btn btn-primary" id="schedule-save">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toasts"></div>
+<script src="/static/js/main.js"></script>
 </body>
 </html>
